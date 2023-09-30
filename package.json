@@ -2,7 +2,7 @@
   "name": "last-commit",
   "displayName": "Last Commit",
   "description": "Shows a timer that displays the how long its been since the last time you did something",
-  "version": "0.0.17",
+  "version": "0.0.21",
   "publisher": "AsaLeHolland",
   "license": "MIT",
   "author": {
@@ -30,7 +30,7 @@
     "Development"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {

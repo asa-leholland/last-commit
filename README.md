@@ -43,7 +43,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Does not work yet.
+Does not work yet..
 
 ## Release Notes
 
