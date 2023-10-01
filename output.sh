@@ -21,7 +21,6 @@ fi
 if [ "$pre_stash_deletions" == "" ]; then
   pre_stash_deletions=0
 fi
-printf "Uncommitted:    𝜟=%d (+%d/-%d)\n" "$((pre_stash_insertions + pre_stash_deletions))" "$pre_stash_insertions" "$pre_stash_deletions"
 
 function quiet_stash() {
   git stash push --keep-index --quiet --message "" --include-untracked
@@ -41,28 +40,21 @@ committed_insertions=0
 committed_deletions=0
 
 while read -r line; do
-echo "$line"
-  insertions=$(echo "$line" | grep -E "([0-9]+ insertions\(\+\))" | awk '{print $1}')
-  deletions=$(echo "$line" | grep -E "([0-9]+ deletions\(-\))" | awk '{print $1}')
+  insertions=$(echo "$line" | grep -oE '[0-9]+ insertions\(\+\)' | grep -oE '[0-9]+')
+  deletions=$(echo "$line" | grep -oE "([0-9]+ deletions\(-\))" | grep -oE '[0-9]+')
   committed_insertions=$((committed_insertions + insertions))
   committed_deletions=$((committed_deletions + deletions))
 done < <(git log --shortstat --oneline "$target_branch..$current_branch" | grep -E "([0-9]+ insertions\(\+\))|([0-9]+ deletions\(-\))")
 
-printf "Committed:      𝜟=%d (+%d/-%d)\n" "$((committed_insertions + committed_deletions))" "$committed_insertions" "$committed_deletions"
-
-# Get the total insertions and deletions from the last lines of `git diff --shortstat`
-shortstat_output=$(git diff --shortstat 2>/dev/null)
-insertions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $4}')
-deletions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $6}')
 
 total_insertions=$((committed_insertions + pre_stash_insertions))
 total_deletions=$((committed_deletions + pre_stash_deletions))
 
 # Print the result in the desired format
 if ((total_insertions + total_deletions > 0)); then
-  printf "All Changes:    𝜟=%d (+%d/-%d)\n" "$((total_insertions + total_deletions))" "$total_insertions" "$total_deletions"
+  printf "𝜟=%d (+%d/-%d)\n" "$((total_insertions + total_deletions))" "$total_insertions" "$total_deletions"
 else
-  printf "All Changes:    𝜟=0 (+0/-0)\n"
+  printf "𝜟=0 (+0/-0)\n"
 fi
 
 # Return to the original branch and unstash changes
