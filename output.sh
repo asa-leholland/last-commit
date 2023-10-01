@@ -59,4 +59,7 @@ fi
 
 # Return to the original branch and unstash changes
 git checkout "$current_branch" --quiet
-git stash pop --quiet
+
+if [ "$(git stash list)" != "" ]; then
+  git stash pop --quiet
+fi
