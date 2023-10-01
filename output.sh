@@ -3,6 +3,12 @@
 # Specify the target branch
 target_branch="main"
 
+function quiet_fetch() {
+  git fetch --quiet
+}
+
+quiet_fetch
+
 # Get the name of the current branch
 current_branch=$(git symbolic-ref --short HEAD)
 
@@ -10,13 +16,17 @@ current_branch=$(git symbolic-ref --short HEAD)
 pre_stash_insertions=$(git diff --shortstat 2>/dev/null | tail -n 1 | awk '{print $4}')
 pre_stash_deletions=$(git diff --shortstat 2>/dev/null | tail -n 1 | awk '{print $6}')
 
-# Stash uncommitted changes
-git stash
+function quiet_stash() {
+  git stash push --keep-index --quiet --message "" --include-untracked
+}
+quiet_stash
 
-# Compare the current branch against the specified target branch
-if [ "$current_branch" != "$target_branch" ]; then
-  git checkout "$target_branch"  # Switch to the specified target branch
-fi
+function quiet_checkout_target_branch() {
+  if [ "$current_branch" != "$target_branch" ]; then
+    git checkout "$target_branch" --quiet
+  fi
+}
+quiet_checkout_target_branch
 
 # Calculate the total insertions and deletions in the commit history
 total_insertions=0
@@ -46,5 +56,5 @@ else
 fi
 
 # Return to the original branch and unstash changes
-git checkout "$current_branch"
-git stash pop
+git checkout "$current_branch" --quiet
+git stash pop --quiet
