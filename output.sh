@@ -15,6 +15,12 @@ current_branch=$(git symbolic-ref --short HEAD)
 # Get the count of local uncommitted insertions and deletions before stashing
 pre_stash_insertions=$(git diff --shortstat 2>/dev/null | tail -n 1 | awk '{print $4}')
 pre_stash_deletions=$(git diff --shortstat 2>/dev/null | tail -n 1 | awk '{print $6}')
+if [ "$pre_stash_insertions" == "" ]; then
+  pre_stash_insertions=0
+fi
+if [ "$pre_stash_deletions" == "" ]; then
+  pre_stash_deletions=0
+fi
 
 function quiet_stash() {
   git stash push --keep-index --quiet --message "" --include-untracked
@@ -24,6 +30,7 @@ quiet_stash
 function quiet_checkout_target_branch() {
   if [ "$current_branch" != "$target_branch" ]; then
     git checkout "$target_branch" --quiet
+    git pull --quiet
   fi
 }
 quiet_checkout_target_branch
@@ -43,6 +50,11 @@ done < <(git log --shortstat --oneline "$target_branch..$current_branch" | grep 
 shortstat_output=$(git diff --shortstat 2>/dev/null)
 insertions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $4}')
 deletions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $6}')
+
+echo $total_deletions
+echo $pre_stash_deletions
+echo $total_insertions
+echo $pre_stash_insertions
 
 # Add the uncommitted changes (both before and after stashing) to the total
 total_insertions=$((total_insertions + pre_stash_insertions))
