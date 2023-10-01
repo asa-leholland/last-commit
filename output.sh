@@ -45,8 +45,8 @@ insertions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $4}')
 deletions=$(echo "$shortstat_output" | tail -n 1 | awk '{print $6}')
 
 # Add the uncommitted changes (both before and after stashing) to the total
-total_insertions=$((total_insertions + pre_stash_insertions + insertions))
-total_deletions=$((total_deletions + pre_stash_deletions + deletions))
+total_insertions=$((total_insertions + pre_stash_insertions))
+total_deletions=$((total_deletions + pre_stash_deletions))
 
 # Print the result in the desired format
 if ((total_insertions + total_deletions > 0)); then
