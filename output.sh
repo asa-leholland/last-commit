@@ -41,8 +41,9 @@ committed_insertions=0
 committed_deletions=0
 
 while read -r line; do
-  insertions=$(echo "$line" | awk '{print $1}')
-  deletions=$(echo "$line" | awk '{print $2}')
+echo "$line"
+  insertions=$(echo "$line" | grep -E "([0-9]+ insertions\(\+\))" | awk '{print $1}')
+  deletions=$(echo "$line" | grep -E "([0-9]+ deletions\(-\))" | awk '{print $1}')
   committed_insertions=$((committed_insertions + insertions))
   committed_deletions=$((committed_deletions + deletions))
 done < <(git log --shortstat --oneline "$target_branch..$current_branch" | grep -E "([0-9]+ insertions\(\+\))|([0-9]+ deletions\(-\))")
